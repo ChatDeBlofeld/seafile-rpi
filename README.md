@@ -1,113 +1,110 @@
-Seafile server package for Raspberry Pi. Maintained by seafile community.
+# Seafile server packages for ARM
+This repository contains a list of scripts to compile Seafile for arm/v7 and arm64.  
 
 ## Download
+The latest **stable** arm builds are [here](https://github.com/lanmarc77/seafile-arm/releases).  
+  
+Usually these are built automatically and run through some basic automatic tests to see if the build at least installs and starts on the supported Linux distributions.  
+  
+## Building
+The build process requires docker to be installed. It has only been tested on x86_x64 machines and builds the arm packages using docker multiarch support.  
+It is designed to run with GitHub actions but can also be run manually.  
 
-- The latest **stable** rpi version is [here](https://github.com/haiwen/seafile-rpi/releases/latest).
+### Build Online
+Just execute the action, check the build results and take the tar.gz files from the generated artifacts.  
+For unknown reasons GitHub actions does not build arm/v7 packages inside the pipeline. Manual builds work though.  
+  
+### Build manually
+Clone this repository. Make sure docker is installed and running.  
+  
+#### Building the server packages
+Just call the build script as needed:  
+  
+```./manualBuildAndTest/buildAllArmv7.sh```  
+(for building all arm/v7 packages for all supported distributions)  
+  
+``` ./manualBuildAndTest/buildAllArm64.sh```  
+(for building all arm64 packages for all supported distributions)  
+  
+The builds should stop and display an error message if something goes wrong. Otherwise server packages are located in the ./out directory.  
+Building can easily take more than one hour. Be patient.  
+  
+#### Testing the server packages
+After the server packages have been build they can be tested. Tests include installing the server package in a brand new distribution default container and letting it run with sqlite and mysql/mariadb backends.  
+  
+```./manualBuildAndTest/testAllArmv7.sh```  
+(for testing all arm/v7 packages for all supported distributions)  
+  
+```./manualBuildAndTest/testAllArm64.sh```  
+(for testing all arm64 packages for all supported distributions)  
+   
+The tests should stop and display an error message if something goes wrong.    
 
-## Build
-
-E.g. to compile Seafile server v10.0.1:
-
-```shell
-$ wget https://raw.githubusercontent.com/haiwen/seafile-rpi/master/build.sh
-$ chmod u+x build.sh
-$ sudo ./build.sh -DTA -v 10.0.1 -h https://github.com/haiwen/seafile-rpi/blob/feat/master/requirements/seahub_requirements_v10.0.1.txt -d https://github.com/haiwen/seafile-rpi/blob/feat/master/requirements/seafdav_requirements_v10.0.1.txt
+## Repository structure / build system architecture
+One server package build and it's test are conducted in the following way:  
+  
+```
+   create a docker build image using the needed
+       Linux distribution and architecture
+       (result: runnable docker container)
+                       |
+                       v
+    run the compilation and packaging script
+            inside the build image
+     (result: .tar.gz server package in ./out)
+                       |
+                       v
+   create a docker test image using the needed
+       Linux distribution and architecture
+       (result: runnable docker container)
+                       |
+                       v
+    run the test script inside the test image
+         with the .tar.gz server package
+       (result: ideally no error message :-))
+       
 ```
 
-Calling `./build.sh` without arguments will return usage information and a list of all available arguments:
+The following directories are part of this repository (in logic order as described above):  
+### .github
+Contains the main.yml file. It basically only calls the below described scripts in the right order with right parameters to try to build and test all distributions and architectures.  
+Usually setup to compile and test the latest Seafile version.  
+### containerBuilders  
+Contains one script for creating the docker container that builds the server packages as well as one for creating the docker containers that lets the tests run for the build server package.  
+The two subfolders contain the dockerfile definitions for the containers.  
+All scripts have small documentation on top which describe their parameters.
+### compileScripts  
+The buildServerPackage.sh script is the initiator which starts a fitting previously created build container and then runs one of compileSeafile*.sh in it to actually compile and build the server package. The buildServerPackage.sh script is the script which determines the Seafile version to be compiled.  
+If a version specific compileSeafile script exists it is used. Otherwise the compileSeafile_default.sh script is used.  
+All scripts have small documentation on top which describe their parameters.
+### testScripts  
+The startServerPackageTest.sh script is the initiator which starts a fitting previously built testing container and then runs one of runTest*.sh in it to actually compile and build the server package.  
+If a version specific runTest script exists it is used. Otherwise the runTest_default.sh script is used.  
+All scripts have small documentation on top which describe their parameters.
+### githubActionsHelper  
+Only contains one script currently to prepare the build host inside the GitHub pipeline to use a modern docker.
+### manualBuildAndTest  
+Contains script for compiling and testing manually/locally outside the GitHub pipeline.  
+The buildAll*.sh scripts try to build all server packages for all distributions and architectures that are supported.  
+The testAll*.sh scripts then starts testing the server packages for all distributions and architectures that are supported.  
+Both scripts contain code to build the docker build and test containers.  
+Usually setup to compile and test the latest Seafile version.  
+The dockerReset.sh clean/resets the local docker setup and is used in the above scripts.  
 
-```shell
-seafile@rpi-focal:~$ sudo ./build.sh
+## New version adjustments
+TODO: explain the steps needed to adjust the scripts to compile for a new/different Seafile version.  
+  
+## Issues, challenges
+### General topics
+* Rust  
+On each build the newest Rust version is downloaded and used. So while a current Rust version works this might change in the future.
+* Go  
+Instead of using a most likely very old Go version a specific Go version is downloaded and used. It is unclear how long older Go versions stay available for downloaded.
 
-Usage:
-  build.sh [OPTIONS]
+### Seafile v10.0.1
+The following changes are done by the compileSeafile_v10.0.1.sh to fix issues:  
+* Markup  
+Markup was fixed to version 2.0.1 in the requirements.txt
+* Compile patch  
+A patch was introduced to also build the newly introduced notification-server
 
-  OPTIONS:
-    -D          Install build dependencies
-    -T          Install thirdparty requirements
-
-    -1          Build/update libevhtp
-    -2          Build/update libsearpc
-    -3          Build/update seafile (c_fileserver)
-    -4          Build/update seafile (go_fileserver)
-    -5          Build/update seafile (notification_server)
-    -6          Build/update seahub
-    -7          Build/update seafobj
-    -8          Build/update seafdav
-    -9          Build/update Seafile server
-
-    -A          All options -1 to -9 in one go
-
-    -v <vers>   Set seafile server version to build
-                default: 10.0.1
-    -r <vers>   Set libsearpc version
-                default: 3.3-latest
-    -f <vers>   Set fixed libsearpc version
-                default: 3.1.0
-    -h <vers>   Set python requirement file for seahub
-                default: https://raw.githubusercontent.com/haiwen/seahub/v10.0.1-server/requirements.txt
-    -d <vers>   Set python requirement file for seafdav
-                default: https://raw.githubusercontent.com/haiwen/seafdav/v10.0.1-server/requirements.txt
-
-    use --version for version info of this script.
-```
-
-Schema of created directory structure after execution of `./build.sh`:
-
-```
-seafile@rpi-focal:~$ tree . -L 3
-.
-├── build.sh
-├── build-server.py.patch
-├── built-seafile-server-pkgs
-│   └── seafile-server-10.0.1-focal-armv7l.tar.gz
-├── built-seafile-sources
-│   └── R10.0.1
-├── go
-│   └── pkg
-├── haiwen-build
-│   ├── libevhtp
-│   ├── libsearpc
-│   ├── seafdav
-│   ├── seafile-server
-│   ├── seafobj
-│   ├── seahub
-│   └── seahub_thirdparty
-└── opt
-    └── local
-```
-
-## Batch Build
-
-If you want to build for multiple distributions and architectures via lxc containers you can run:
-
-```shell
-$ wget https://raw.githubusercontent.com/haiwen/seafile-rpi/master/build-batch.sh
-$ chmod u+x build-batch.sh
-$ sudo time bash ./build-batch.sh 10.0.1
-```
-
-Edit the script in order to build for your preferred distributions.
-
-If want to execute the script in the background with logs written to `build-batch.log` call:
-```shell
-sudo su
-nohup bash -c "sudo time bash ./build-batch.sh 9.0.9" >build-batch.log 2>build-batch.log < /dev/null &
-```
-
-## Manual and Guides
-
-- [Build Seafile server](https://manual.seafile.com/build_seafile/rpi/)
-- [Deploy Seafile server](https://manual.seafile.com/deploy/)
-
-## Reporting Issues / GitHub Issues
-
-If you have any problems or suggestions when using the seafile rpi server package, please report it
-on [seafile server forum](https://forum.seafile.com/).
-
-**GitHub Issues support is dropped** and will not be maintained anymore. If you need help, clarification or report some
-weird behaviour, please post it on the [seafile server forum](https://forum.seafile.com/) as well.
-
-## Contributors
-
-See [CONTRIBUTORS](https://github.com/haiwen/seafile-rpi/graphs/contributors).

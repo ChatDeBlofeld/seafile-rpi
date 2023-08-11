@@ -1,10 +1,5 @@
 # output folders
-build/
-seafile-sources/
-seafile-server-pkgs/
-
-# build artefacts
-.build.sh.swp
+out
 
 # MacOS
 .DS_Store
@@ -14,3 +9,6 @@ seafile-server-pkgs/
 
 # VSCode
 .vscode
+
+# dotenv
+.env
