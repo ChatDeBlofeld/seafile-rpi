@@ -493,11 +493,6 @@ install_thirdparty()
   msg "   Install Seahub and SeafDAV thirdparty requirements"
   (set -x; python3 -m pip install -r "requirements/requirements.txt" --target "${THIRDPARTYFOLDER}" --no-cache --upgrade --no-deps)
   exitonfailure "Thirdparty requirements installation failed"
-
-  # clean up
-  msg "   Clean up"
-  rm "${THIRDPARTYFOLDER}/requirements.txt" "${THIRDPARTYFOLDER}/requirements_SeafDAV.txt"
-  rm -rf $(find . -name "__pycache__")
 }
 
 #
@@ -535,8 +530,8 @@ build_seahub()
   msg "   PYTHONPATH = $PYTHONPATH${OFF}"
 
   # to fix [ERROR] django-admin scripts not found in PATH
-  msg "   export THIRDPARTYFOLDER/django/bin to PATH"
-  export PATH="${THIRDPARTYFOLDER}/django/bin:${PATH}"
+  msg "   export THIRDPARTYFOLDER/bin to PATH"
+  export PATH="${THIRDPARTYFOLDER}/bin:${PATH}"
   msg "   PATH = ${PATH}"
 
   # generate package
