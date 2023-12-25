@@ -6,6 +6,10 @@ set -a
 [ -f .env ] && . .env
 set +a
 
+if [ "$SEAFILE_SERVER_VERSION" ]; then
+    ARGS="-v $SEAFILE_SERVER_VERSION"
+fi
+
 while getopts B:o:P:123456789ATv:r:f: flag
 do
     case "${flag}" in
