@@ -8,5 +8,6 @@ mysqlclient
 Pillow
 pkg_resources
 pylibmc
+python-ldap
 PyYAML
 SQLAlchemy
