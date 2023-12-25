@@ -11,7 +11,8 @@ cmd="python3 -m venv /env && source /env/bin/activate \
 
 (set +x; docker run -it --rm \
     -v "$ROOT_DIR":/requirements \
-    python:slim /bin/bash -c "$cmd")
+    // FIXME: compatibility with further python versions
+    python:3.11-slim /bin/bash -c "$cmd")
 
 mapfile -t ignored < ignored.txt
 (IFS="|"; grep -vE "^(${ignored[*]})==.*$" tmp.txt) > requirements.txt
