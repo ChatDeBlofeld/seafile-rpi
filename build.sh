@@ -322,10 +322,11 @@ build_libevhtp()
   if [ -d "libevhtp" ]; then
     cd libevhtp
     (set -x; make clean)
-    (set -x; git fetch origin --tags)
-    (set -x; git reset --hard origin/master)
+    (set -x; git reset --hard)
+    (set -x; git fetch --depth 1 origin master)
+    (set -x; git checkout FETCH_HEAD)
   else
-    (set -x; git clone "https://www.github.com/haiwen/libevhtp.git")
+    (set -x; git clone --depth 1 "https://www.github.com/haiwen/libevhtp.git")
     cd libevhtp
   fi
   (set -x; cmake -DCMAKE_INSTALL_PREFIX=${PREFIX} -DEVHTP_DISABLE_SSL=ON -DEVHTP_BUILD_SHARED=OFF .)
@@ -365,13 +366,13 @@ build_libsearpc()
   if [ -d "libsearpc" ]; then
     cd libsearpc
     (set -x; make clean && make distclean)
-    (set -x; git fetch origin --tags)
-    (set -x; git reset --hard origin/master)
+    (set -x; git reset --hard)
+    (set -x; git fetch --depth 1 origin "${LIBSEARPC_TAG}")
+    (set -x; git checkout FETCH_HEAD)
   else
-    (set -x; git clone "https://github.com/haiwen/libsearpc.git")
+    (set -x; git clone --branch "${LIBSEARPC_TAG}" --depth 1 "https://github.com/haiwen/libsearpc.git")
     cd libsearpc
   fi
-  (set -x; git reset --hard "${LIBSEARPC_TAG}")
   (set -x; ./autogen.sh)
   (set -x; ./configure)
   (set -x; make dist)
@@ -392,13 +393,13 @@ build_seafile()
   if [ -d "seafile-server" ]; then
     cd seafile-server
     (set -x; make clean && make distclean)
-    (set -x; git fetch origin --tags)
-    (set -x; git reset --hard origin/master)
+    (set -x; git reset --hard)
+    (set -x; git fetch --depth 1 origin "${VERSION_TAG}")
+    (set -x; git checkout FETCH_HEAD)
   else
-    (set -x; git clone "https://github.com/haiwen/seafile-server.git")
+    (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafile-server.git")
     cd seafile-server
   fi
-  (set -x; git reset --hard "${VERSION_TAG}")
   (set -x; ./autogen.sh)
   (set -x; ./configure --with-mysql=${MYSQL_CONFIG_PATH} --enable-ldap)
   (set -x; make dist)
@@ -419,13 +420,13 @@ build_seafile_go_fileserver()
   if [ -d "seafile-server" ]; then
     cd seafile-server
     (set -x; make clean && make distclean)
-    (set -x; git fetch origin --tags)
-    (set -x; git reset --hard origin/master)
+    (set -x; git reset --hard)
+    (set -x; git fetch --depth 1 origin "${VERSION_TAG}")
+    (set -x; git checkout FETCH_HEAD)
   else
-    (set -x; git clone "https://github.com/haiwen/seafile-server.git")
+    (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafile-server.git")
     cd seafile-server
   fi
-  (set -x; git reset --hard "${VERSION_TAG}")
   (set -x; cd fileserver && CGO_ENABLED=0 go build .)
   exitonfailure "Build seafile-server (go_fileserver) failed"
   cd "${SCRIPTPATH}"
@@ -444,13 +445,13 @@ build_seafile_notification_server()
   if [ -d "seafile-server" ]; then
     cd seafile-server
     (set -x; make clean && make distclean)
-    (set -x; git fetch origin --tags)
-    (set -x; git reset --hard origin/master)
+    (set -x; git reset --hard)
+    (set -x; git fetch --depth 1 origin "${VERSION_TAG}")
+    (set -x; git checkout FETCH_HEAD)
   else
-    (set -x; git clone "https://github.com/haiwen/seafile-server.git")
+    (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafile-server.git")
     cd seafile-server
   fi
-  (set -x; git reset --hard "${VERSION_TAG}")
   (set -x; cd notification-server && CGO_ENABLED=0 go build .)
   exitonfailure "Build seafile-server (notification_server) failed"
   cd "${SCRIPTPATH}"
@@ -517,13 +518,13 @@ build_seahub()
   if [ -d "seahub" ]; then
     cd seahub
     (set -x; make clean)
-    (set -x; git fetch origin --tags)
-    (set -x; git reset --hard origin/master)
+    (set -x; git reset --hard)
+    (set -x; git fetch --depth 1 origin "${VERSION_TAG}")
+    (set -x; git checkout FETCH_HEAD)
   else
-    (set -x; git clone "https://github.com/haiwen/seahub.git")
+    (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seahub.git")
     cd seahub
   fi
-  (set -x; git reset --hard "${VERSION_TAG}")
 
   # export ${THIRDPARTYFOLDER} to ${PATH}
   msg "   Export THIRDPARTYFOLDER to PATH"
@@ -561,13 +562,13 @@ build_seafobj()
   cd "${BUILDPATH}"
   if [ -d "seafobj" ]; then
     cd seafobj
-    (set -x; git fetch origin --tags)
-    (set -x; git reset --hard origin/master)
+    (set -x; git reset --hard)
+    (set -x; git fetch --depth 1 origin "${VERSION_TAG}")
+    (set -x; git checkout FETCH_HEAD)
   else
-    (set -x; git clone "https://github.com/haiwen/seafobj.git")
+    (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafobj.git")
     cd seafobj
   fi
-  (set -x; git reset --hard "${VERSION_TAG}")
   (set -x; make dist)
   exitonfailure "Build seafobj failed"
   cd "${SCRIPTPATH}"
@@ -585,13 +586,13 @@ build_seafdav()
   cd "${BUILDPATH}"
   if [ -d "seafdav" ]; then
     cd seafdav
-    (set -x; git fetch origin --tags)
-    (set -x; git reset --hard origin/master)
+    (set -x; git reset --hard)
+    (set -x; git fetch --depth 1 origin "${VERSION_TAG}")
+    (set -x; git checkout FETCH_HEAD)
   else
-    (set -x; git clone "https://github.com/haiwen/seafdav.git")
+    (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafdav.git")
     cd seafdav
   fi
-  (set -x; git reset --hard "${VERSION_TAG}")
   (set -x; make)
   exitonfailure "Build seafdav failed"
   cd "${SCRIPTPATH}"
@@ -609,13 +610,13 @@ build_seafevents()
   cd "${BUILDPATH}"
   if [ -d "seafevents" ]; then
     cd seafevents
-    (set -x; git fetch origin --tags)
-    (set -x; git reset --hard origin/master)
+    (set -x; git reset --hard)
+    (set -x; git fetch --depth 1 origin "${VERSION_TAG}")
+    (set -x; git checkout FETCH_HEAD)
   else
-    (set -x; git clone "https://github.com/haiwen/seafevents.git")
+    (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafevents.git")
     cd seafevents
   fi
-  (set -x; git reset --hard "${VERSION_TAG}")
   (set -x; make)
   exitonfailure "Build seafevents failed"
   cd "${SCRIPTPATH}"
