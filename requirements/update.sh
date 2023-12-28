@@ -9,9 +9,9 @@ cmd="python3 -m venv /env && source /env/bin/activate \
     && python3 -m pip freeze > /requirements/tmp.txt \
     && chown $(id -u):$(id -g) /requirements/tmp.txt"
 
+# FIXME: compatibility with further python versions
 (set +x; docker run -it --rm \
     -v "$ROOT_DIR":/requirements \
-    // FIXME: compatibility with further python versions
     python:3.11-slim /bin/bash -c "$cmd")
 
 mapfile -t ignored < ignored.txt

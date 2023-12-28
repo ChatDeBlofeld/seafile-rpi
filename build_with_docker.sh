@@ -14,6 +14,7 @@ while getopts B:o:P:123456789ATv:r:f: flag
 do
     case "${flag}" in
         B) BUILDER=$OPTARG;;
+        c) CACHE_DIR=$OPTARG;;
         o) OUTPUT_DIR=$OPTARG;;
         P) PLATFORMS=$OPTARG;;
         v) ARGS=$ARGS" -v $OPTARG";;
@@ -35,7 +36,8 @@ do
     esac
 done
 
-if [ ! "$OUTPUT_DIR" ]; then OUTPUT_DIR="./build"; fi
+if [ ! "$CACHE_DIR" ]; then CACHE_DIR="./build"; fi
+if [ ! "$OUTPUT_DIR" ]; then OUTPUT_DIR="./packages"; fi
 if [ ! "$BUILDER" ]; then 
     echo "Builder not specified, abort..."
     exit 1
@@ -49,8 +51,12 @@ OUTPUT_DIR="$ROOT_DIR/$OUTPUT_DIR"
 IFS=',' read -r -a platforms <<< "$PLATFORMS"
 for platform in "${platforms[@]}"
 do
-    distro="$(sed 's#linux/##' <<< $platform)"
-    tag="$(sed 's#/##' <<< $distro)"
+    arch="$(sed 's#linux/##' <<< $platform)"
+    tag="$(sed 's#/##' <<< $arch)"
+
+    if [ ! -d "$CACHE_DIR/$tag" ]; then
+        mkdir -p "$OUTPUT_DIR/$tag"
+    fi
 
     if [ ! -d "$OUTPUT_DIR/$tag" ]; then
         mkdir -p "$OUTPUT_DIR/$tag"
@@ -67,9 +73,9 @@ do
         --pull always \
         -v "$ROOT_DIR/build.sh":/build.sh \
         -v "$ROOT_DIR/requirements":/requirements \
-        -v "$OUTPUT_DIR/$tag/haiwen-build":/haiwen-build \
-        -v "$OUTPUT_DIR/$tag/built-seafile-sources":/built-seafile-sources \
-        -v "$OUTPUT_DIR/$tag/root/opt/local":/root/opt/local \
-        -v "$OUTPUT_DIR/$tag/built-seafile-server-pkgs":/built-seafile-server-pkgs \
+        -v "$CACHE_DIR/$tag/haiwen-build":/haiwen-build \
+        -v "$CACHE_DIR/$tag/built-seafile-sources":/built-seafile-sources \
+        -v "$CACHE_DIR/$tag/root/opt/local":/root/opt/local \
+        -v "$OUTPUT_DIR/$tag":/built-seafile-server-pkgs \
         $BUILDER /bin/bash -c "$cmd")
 done
