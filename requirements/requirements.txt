@@ -3,7 +3,6 @@ bleach==5.0.1
 captcha==0.4
 certifi==2023.11.17
 chardet==5.1.0
-cryptography==41.0.7
 defusedxml==0.7.1
 Django==4.2.8
 django-appconf==1.0.6

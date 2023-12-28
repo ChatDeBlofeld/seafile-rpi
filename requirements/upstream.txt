@@ -42,11 +42,6 @@ django-pylibmc
 # Scripts deps
 pymysql
 
-# Bugfix
-# https://stackoverflow.com/questions/74041308/pip-throws-typeerror-deprecated-error
-# pyOpenSSL==22.0.0
-
-
 ### Seafdav
 
 defusedxml~=0.5
