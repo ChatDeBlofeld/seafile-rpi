@@ -10,7 +10,7 @@ if [ "$SEAFILE_SERVER_VERSION" ]; then
     ARGS="-v $SEAFILE_SERVER_VERSION"
 fi
 
-while getopts B:o:P:123456789ATv:r:f: flag
+while getopts B:o:P:0123456789ATv:r:f: flag
 do
     case "${flag}" in
         B) BUILDER=$OPTARG;;
@@ -18,6 +18,7 @@ do
         o) OUTPUT_DIR=$OPTARG;;
         P) PLATFORMS=$OPTARG;;
         v) ARGS=$ARGS" -v $OPTARG";;
+        0) ARGS=$ARGS" -1";;
         1) ARGS=$ARGS" -1";;
         2) ARGS=$ARGS" -2";;
         3) ARGS=$ARGS" -3";;
@@ -72,6 +73,7 @@ do
         --platform $platform \
         --pull always \
         -v "$ROOT_DIR/build.sh":/build.sh \
+        -v "$ROOT_DIR/build-server.tmp.py":/build-server.tmp.py \
         -v "$ROOT_DIR/requirements":/requirements \
         -v "$CACHE_DIR/$tag/haiwen-build":/haiwen-build \
         -v "$CACHE_DIR/$tag/built-seafile-sources":/built-seafile-sources \

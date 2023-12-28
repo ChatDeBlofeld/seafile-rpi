@@ -5,3 +5,4 @@
 
 # Files
 !/build.sh
+!/build-server.tmp.py

@@ -42,6 +42,7 @@ CONF_BUILD_SEAFILE_NOTIFICATION_SERVER=false
 CONF_BUILD_SEAHUB=false
 CONF_BUILD_SEAFOBJ=false
 CONF_BUILD_SEAFDAV=false
+CONF_BUILD_SEAFEVENTS=false
 CONF_BUILD_SEAFILE_SERVER=false
 PREP_BUILD=false
 COPY_PKG_SOURCE=false
@@ -103,14 +104,15 @@ Usage:
     ${TXT_BOLD}-D${OFF}          Install build dependencies
     ${TXT_BOLD}-T${OFF}          Install thirdparty requirements
 
-    ${TXT_BOLD}-1${OFF}          Build/update libevhtp
-    ${TXT_BOLD}-2${OFF}          Build/update libsearpc
-    ${TXT_BOLD}-3${OFF}          Build/update seafile (c_fileserver)
-    ${TXT_BOLD}-4${OFF}          Build/update seafile (go_fileserver)
-    ${TXT_BOLD}-5${OFF}          Build/update seafile (notification_server)
-    ${TXT_BOLD}-6${OFF}          Build/update seahub
-    ${TXT_BOLD}-7${OFF}          Build/update seafobj
-    ${TXT_BOLD}-8${OFF}          Build/update seafdav
+    ${TXT_BOLD}-0${OFF}          Build/update libevhtp
+    ${TXT_BOLD}-1${OFF}          Build/update libsearpc
+    ${TXT_BOLD}-2${OFF}          Build/update seafile (c_fileserver)
+    ${TXT_BOLD}-3${OFF}          Build/update seafile (go_fileserver)
+    ${TXT_BOLD}-4${OFF}          Build/update seafile (notification_server)
+    ${TXT_BOLD}-5${OFF}          Build/update seahub
+    ${TXT_BOLD}-6${OFF}          Build/update seafobj
+    ${TXT_BOLD}-7${OFF}          Build/update seafdav
+    ${TXT_BOLD}-8${OFF}          Build/update seafevents
     ${TXT_BOLD}-9${OFF}          Build/update Seafile server
 
     ${TXT_BOLD}-A${OFF}          All options ${TXT_BOLD}-1${OFF} to ${TXT_BOLD}-9${OFF} in one go
@@ -136,41 +138,46 @@ while getopts ":123456789ADTv:r:f:h:d:" OPT; do
         T) CONF_INSTALL_THIRDPART=true >&2
            STEPS=$((STEPS+1)) >&2
            ;;
-        1) CONF_BUILD_LIBEVHTP=true >&2
+        0) CONF_BUILD_LIBEVHTP=true >&2
            PREP_BUILD=true >&2
            STEPS=$((STEPS+1)) >&2
            ;;
-        2) CONF_BUILD_LIBSEARPC=true >&2
-           PREP_BUILD=true >&2
-           COPY_PKG_SOURCE=true >&2
-           STEPS=$((STEPS+1)) >&2
-           ;;
-        3) CONF_BUILD_SEAFILE=true >&2
+        1) CONF_BUILD_LIBSEARPC=true >&2
            PREP_BUILD=true >&2
            COPY_PKG_SOURCE=true >&2
            STEPS=$((STEPS+1)) >&2
            ;;
-        4) CONF_BUILD_SEAFILE_GO_FILESERVER=true >&2
+        2) CONF_BUILD_SEAFILE=true >&2
            PREP_BUILD=true >&2
            COPY_PKG_SOURCE=true >&2
            STEPS=$((STEPS+1)) >&2
            ;;
-        5) CONF_BUILD_SEAFILE_NOTIFICATION_SERVER=true >&2
+        3) CONF_BUILD_SEAFILE_GO_FILESERVER=true >&2
            PREP_BUILD=true >&2
            COPY_PKG_SOURCE=true >&2
            STEPS=$((STEPS+1)) >&2
            ;;
-        6) CONF_BUILD_SEAHUB=true >&2
+        4) CONF_BUILD_SEAFILE_NOTIFICATION_SERVER=true >&2
            PREP_BUILD=true >&2
            COPY_PKG_SOURCE=true >&2
            STEPS=$((STEPS+1)) >&2
            ;;
-        7) CONF_BUILD_SEAFOBJ=true >&2
+        5) CONF_BUILD_SEAHUB=true >&2
            PREP_BUILD=true >&2
            COPY_PKG_SOURCE=true >&2
            STEPS=$((STEPS+1)) >&2
            ;;
-        8) CONF_BUILD_SEAFDAV=true >&2
+        6) CONF_BUILD_SEAFOBJ=true >&2
+           PREP_BUILD=true >&2
+           COPY_PKG_SOURCE=true >&2
+           STEPS=$((STEPS+1)) >&2
+           ;;
+        7) CONF_BUILD_SEAFDAV=true >&2
+           PREP_BUILD=true >&2
+           COPY_PKG_SOURCE=true >&2
+           STEPS=$((STEPS+1)) >&2
+           ;;
+        8) CONF_BUILD_SEAFEVENTS=true >&2
            PREP_BUILD=true >&2
            COPY_PKG_SOURCE=true >&2
            STEPS=$((STEPS+1)) >&2
@@ -188,6 +195,7 @@ while getopts ":123456789ADTv:r:f:h:d:" OPT; do
            CONF_BUILD_SEAHUB=true >&2
            CONF_BUILD_SEAFOBJ=true >&2
            CONF_BUILD_SEAFDAV=true >&2
+           CONF_BUILD_SEAFEVENTS=true >&2
            CONF_BUILD_SEAFILE_SERVER=true >&2
            PREP_BUILD=true >&2
            COPY_PKG_SOURCE=true >&2
@@ -491,7 +499,7 @@ install_thirdparty()
   # install Seahub and SeafDAV thirdparty requirements
   # on pip=20.* DEPRECATION: --install-option: ['--install-lib', '--install-scripts']
   msg "   Install Seahub and SeafDAV thirdparty requirements"
-  (set -x; python3 -m pip install -r "requirements/requirements.txt" --target "${THIRDPARTYFOLDER}" --no-cache --upgrade --no-deps)
+  (set -x; python3 -m pip install -r "${SCRIPTPATH}/requirements/requirements.txt" --target "${THIRDPARTYFOLDER}" --no-cache --upgrade --no-deps)
   exitonfailure "Thirdparty requirements installation failed"
 }
 
@@ -590,6 +598,30 @@ build_seafdav()
 }
 
 #
+# BUILD seafevents
+#
+
+build_seafevents()
+{
+  STEPCOUNTER=$((STEPCOUNTER+1))
+  msg "-> [${STEPCOUNTER}/${STEPS}] Build seafevents"
+
+  cd "${BUILDPATH}"
+  if [ -d "seafevents" ]; then
+    cd seafevents
+    (set -x; git fetch origin --tags)
+    (set -x; git reset --hard origin/master)
+  else
+    (set -x; git clone "https://github.com/haiwen/seafevents.git")
+    cd seafevents
+  fi
+  (set -x; git reset --hard "${VERSION_TAG}")
+  (set -x; make)
+  exitonfailure "Build seafevents failed"
+  cd "${SCRIPTPATH}"
+}
+
+#
 # COPY package sources
 #
 
@@ -606,7 +638,8 @@ copy_pkg_source()
       "${BUILDPATH}/seafile-server/notification-server/notification-server" \
       "${BUILDPATH}/seahub/seahub-${VERSION_SEAFILE}.tar.gz" \
       "${BUILDPATH}/seafobj/seafobj.tar.gz" \
-      "${BUILDPATH}/seafdav/seafdav.tar.gz"
+      "${BUILDPATH}/seafdav/seafdav.tar.gz" \
+      "${BUILDPATH}/seafevents/seafevents.tar.gz"
   do
       [ -f "$i" ] && (set -x; cp "$i" "${SCRIPTPATH}/${PKGSOURCEDIR}/R${VERSION}")
   done
@@ -624,45 +657,8 @@ build_server()
   cd "${BUILDPATH}"
   mkmissingdir "${SCRIPTPATH}/${PKGDIR}"
 
-  # TODO: remove at seafile 10.0.2 release
-  msg "-> Patch build-server.py"
-  echo "--- build-server.py.old	2023-04-23 17:26:19.233328609 +0200
-+++ build-server.py	2023-04-23 17:22:58.625726460 +0200
-@@ -549,6 +549,15 @@
- 
-     must_copy(src_go_fileserver, dst_bin_dir)
- 
-+# copy notification_server "notification-server" to directory seafile-server/seafile/bin
-+def copy_notification_server():
-+    builddir = conf[CONF_BUILDDIR]
-+    srcdir = conf[CONF_SRCDIR]
-+    src_notification_server = os.path.join(srcdir, 'notification-server')
-+    dst_bin_dir = os.path.join(builddir, 'seafile-server', 'seafile', 'bin')
-+
-+    must_copy(src_notification_server, dst_bin_dir)
-+
- def copy_seafdav():
-     dst_dir = os.path.join(conf[CONF_BUILDDIR], 'seafile-server', 'seahub', 'thirdpart')
-     tarball = os.path.join(conf[CONF_SRCDIR], 'seafdav.tar.gz')
-@@ -578,6 +587,8 @@
-               serverdir)
-     must_copy(os.path.join(scripts_srcdir, 'seafile.sh'),
-               serverdir)
-+    must_copy(os.path.join(scripts_srcdir, 'seafile-monitor.sh'),
-+              serverdir)
-     must_copy(os.path.join(scripts_srcdir, 'seahub.sh'),
-               serverdir)
-     must_copy(os.path.join(scripts_srcdir, 'reset-admin.sh'),
-@@ -635,6 +646,9 @@
-     # copy go_fileserver
-     copy_go_fileserver()
- 
-+    # copy notification_server
-+    copy_notification_server()
-+
- def copy_pdf2htmlex():
-     '''Copy pdf2htmlEX exectuable and its dependent libs'''
-     pdf2htmlEX_executable = find_in_path('pdf2htmlEX')" | patch -N -b -u "${BUILDPATH}/seahub/scripts/build/build-server.py"
+  # FIXME: make a pull request upstream
+  cp -f "${SCRIPTPATH}/build-server.tmp.py" "${BUILDPATH}/seahub/scripts/build/build-server.py"
 
   msg "-> Executing build-server.py"
   (set -x; python3 "${BUILDPATH}/seahub/scripts/build/build-server.py" \
@@ -709,6 +705,7 @@ ${CONF_BUILD_SEAFILE_NOTIFICATION_SERVER} && build_seafile_notification_server
 ${CONF_BUILD_SEAHUB} && build_seahub
 ${CONF_BUILD_SEAFOBJ} && build_seafobj
 ${CONF_BUILD_SEAFDAV} && build_seafdav
+${CONF_BUILD_SEAFEVENTS} && build_seafevents
 
 ${COPY_PKG_SOURCE} && copy_pkg_source
 
