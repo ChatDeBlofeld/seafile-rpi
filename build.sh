@@ -617,6 +617,7 @@ build_seafevents()
     (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafevents.git")
     cd seafevents
   fi
+  (set -x; make clean)
   (set -x; make)
   exitonfailure "Build seafevents failed"
   cd "${SCRIPTPATH}"
