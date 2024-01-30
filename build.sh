@@ -130,7 +130,7 @@ Usage:
 fi
 
 # get the options
-while getopts ":123456789ADTv:r:f:h:d:" OPT; do
+while getopts ":0123456789ADTv:r:f:h:d:" OPT; do
     case $OPT in
         D) CONF_INSTALL_DEPENDENCIES=true >&2
            STEPS=$((STEPS+1)) >&2
