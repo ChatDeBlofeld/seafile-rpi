@@ -14,10 +14,8 @@ do
         r) REGISTRY="$OPTARG";;
         u) REPOSITORY=$OPTARG;;
         i) IMAGE=$OPTARG;;
-        t) TAGS="$TAGS -t $([ "$REGISTRY" ] && echo $REGISTRY/)$REPOSITORY/$IMAGE:$OPTARG";;
         p) OUTPUT="--push";;
         P) PLATFORMS=$OPTARG;;
-        l) OUTPUT="--load"; PLATFORMS="linux/$OPTARG";;
         :) exit 1;;
         \?) exit 1;; 
     esac
@@ -35,30 +33,11 @@ cd "$ROOT_DIR"
 # Register/update emulators
 docker run --rm --privileged tonistiigi/binfmt --install all >/dev/null
 
-# Create custom network
-network=seafile-builder
-if [ ! "$(docker network ls -q --filter name=$network)" ]
-then
-    docker network create $network
-fi
-
-# Create local registry
-if [ "$REGISTRY" = "registry:5000" ]
-then
-    registry_name=registry
-    if [ ! "$(docker container ls -aq --filter name=$registry_name)" ]
-    then
-        docker run -d --name $registry_name -p 5000:5000 --network $network registry:2
-    fi
-
-    docker start $registry_name
-fi
-
 # create multiarch builder if needed
 builder=multiarch_builder
 if [ "$(docker buildx ls | grep $builder)" == "" ]
 then
-    docker buildx create --name $builder --driver-opt network=$network
+    docker buildx create --name $builder
 fi
 
 # Use the builder
@@ -68,4 +47,19 @@ set -x
 # Build image
 docker buildx build \
     -f "$DOCKERFILE" \
-    $OUTPUT --platform "$PLATFORMS" $TAGS "$DOCKERFILE_DIR"
+    --platform "$PLATFORMS" "$DOCKERFILE_DIR"
+set +x
+
+IFS=',' read -r -a platforms <<< "$PLATFORMS"
+for platform in "${platforms[@]}"
+do
+    arch="$(sed 's#linux/##' <<< $platform)"
+    tag="$(sed 's#/##' <<< $arch)"
+
+    docker buildx build \
+        -f "$DOCKERFILE" \
+        --platform "$platform" \
+        --load \
+        -t "$([ "$REGISTRY" ] && echo $REGISTRY/)$REPOSITORY/$IMAGE:$tag" \
+        "$DOCKERFILE_DIR"
+done

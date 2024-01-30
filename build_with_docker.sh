@@ -18,7 +18,7 @@ do
         o) OUTPUT_DIR=$OPTARG;;
         P) PLATFORMS=$OPTARG;;
         v) ARGS=$ARGS" -v $OPTARG";;
-        0) ARGS=$ARGS" -1";;
+        0) ARGS=$ARGS" -0";;
         1) ARGS=$ARGS" -1";;
         2) ARGS=$ARGS" -2";;
         3) ARGS=$ARGS" -3";;
@@ -70,8 +70,6 @@ do
 
     (set -x;
     docker run -it --rm \
-        --platform $platform \
-        --pull always \
         -v "$ROOT_DIR/build.sh":/build.sh \
         -v "$ROOT_DIR/build-server.tmp.py":/build-server.tmp.py \
         -v "$ROOT_DIR/requirements":/requirements \
@@ -79,5 +77,5 @@ do
         -v "$CACHE_DIR/$tag/built-seafile-sources":/built-seafile-sources \
         -v "$CACHE_DIR/$tag/root/opt/local":/root/opt/local \
         -v "$OUTPUT_DIR/$tag":/built-seafile-server-pkgs \
-        $BUILDER /bin/bash -c "$cmd")
+        $BUILDER:$tag /bin/bash -c "$cmd")
 done
