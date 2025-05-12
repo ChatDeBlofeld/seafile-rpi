@@ -1,6 +1,6 @@
 #!/bin/bash
 [[ "$1" =~ ^(--version)$ ]] && {
-    echo "2023-05-13";
+    echo "2025-05-13";
     exit 0
 };
 
@@ -22,7 +22,7 @@ PREFIX="${HOME}/opt/local"
 
 LIBSEARPC_VERSION_LATEST="3.3-latest" # check if new tag is available on https://github.com/haiwen/libsearpc/releases
 LIBSEARPC_VERSION_FIXED="3.1.0" # libsearpc sticks to 3.1.0 https://github.com/haiwen/libsearpc/commit/43d768cf2eea6afc6e324c2b1a37a69cd52740e3
-VERSION="10.0.1"
+VERSION="11.0.13"
 VERSION_SEAFILE="6.0.1" # dummy version for seafile (see configure.ac)
 MYSQL_CONFIG_PATH="/usr/bin/mysql_config" # ensure compilation with mysql support
 
@@ -115,7 +115,7 @@ Usage:
     ${TXT_BOLD}-8${OFF}          Build/update seafevents
     ${TXT_BOLD}-9${OFF}          Build/update Seafile server
 
-    ${TXT_BOLD}-A${OFF}          All options ${TXT_BOLD}-1${OFF} to ${TXT_BOLD}-9${OFF} in one go
+    ${TXT_BOLD}-A${OFF}          All options ${TXT_BOLD}-0${OFF} to ${TXT_BOLD}-9${OFF} in one go
 
     ${TXT_BOLD}-v${OFF} ${TXT_RED}${TXT_ITALIC}<vers>${OFF}   Set seafile server version to build
                 ${TXT_LGRAY}default:${OFF} ${TXT_BLUE}${VERSION}${OFF}
@@ -199,7 +199,7 @@ while getopts ":0123456789ADTv:r:f:h:d:" OPT; do
            CONF_BUILD_SEAFILE_SERVER=true >&2
            PREP_BUILD=true >&2
            COPY_PKG_SOURCE=true >&2
-           STEPS=$((STEPS+9)) >&2
+           STEPS=$((STEPS+10)) >&2
            ;;
         v) VERSION=$OPTARG >&2
            VERSION_TAG="v${VERSION}-server" >&2
@@ -400,6 +400,8 @@ build_seafile()
     (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafile-server.git")
     cd seafile-server
   fi
+  # FIXME: make a pull request upstream to remove this file
+  echo "" > ./doc/Makefile.am
   (set -x; ./autogen.sh)
   (set -x; ./configure --with-mysql=${MYSQL_CONFIG_PATH} --enable-ldap)
   (set -x; make dist)
@@ -452,6 +454,8 @@ build_seafile_notification_server()
     (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafile-server.git")
     cd seafile-server
   fi
+  # FIXME: make a pull request upstream to remove this file
+  echo "" > ./doc/Makefile.am
   (set -x; cd notification-server && CGO_ENABLED=0 go build .)
   exitonfailure "Build seafile-server (notification_server) failed"
   cd "${SCRIPTPATH}"
@@ -659,8 +663,7 @@ build_server()
   cd "${BUILDPATH}"
   mkmissingdir "${SCRIPTPATH}/${PKGDIR}"
 
-  # FIXME: make a pull request upstream
-  cp -f "${SCRIPTPATH}/build-server.tmp.py" "${BUILDPATH}/seahub/scripts/build/build-server.py"
+  cp -f "${SCRIPTPATH}/build-server.py" "${BUILDPATH}/seahub/scripts/build/build-server.py"
 
   msg "-> Executing build-server.py"
   (set -x; python3 "${BUILDPATH}/seahub/scripts/build/build-server.py" \

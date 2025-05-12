@@ -240,7 +240,7 @@ def check_seahub_thirdpart(thirdpartdir):
 
     '''
     thirdpart_libs = [
-        'Django',
+        'django',
         # 'Djblets',
         'gunicorn',
         #'flup',
@@ -544,14 +544,7 @@ def copy_pro_libs():
     pro_libs_dir = os.path.join(pro_program_dir, 'python')
     must_mkdir(pro_libs_dir)
 
-    # FIXME: needed or thirpart coud do the job?
-    # must_copytree(conf[CONF_PROLIBSDIR], pro_libs_dir)
-
-    # pro_py = os.path.join(Seahub().projdir, 'scripts', 'pro.py')
-    # must_copy(pro_py, pro_program_dir)
-
     uncompress_seafes_seafevents()
-
 
 def uncompress_seafes_seafevents():
     '''Extract seafes.tar.gz and seafevents.tar.gz, libevent.tar.gz to
@@ -561,19 +554,9 @@ def uncompress_seafes_seafevents():
     builddir = conf[CONF_BUILDDIR]
     pro_libs_dir = os.path.join(builddir, 'seafile-server', 'pro', 'python')
 
-    # FIXME: What's this?
-    # tarball = os.path.join(conf[CONF_SRCDIR], 'seafes.tar.gz')
-    # if run('tar xf %s -C %s' % (tarball, pro_libs_dir)) != 0:
-    #     error('failed to uncompress %s' % tarball)
-
     tarball = os.path.join(conf[CONF_SRCDIR], 'seafevents.tar.gz')
     if run('tar xf %s -C %s' % (tarball, pro_libs_dir)) != 0:
         error('failed to uncompress %s' % tarball)
-
-    # FIXME: What's this too?
-    # tarball = os.path.join(conf[CONF_SRCDIR], 'libevent.tar.gz')
-    # if run('tar xf %s -C %s' % (tarball, pro_libs_dir)) != 0:
-        # error('failed to uncompress %s' % tarball)
 
 def copy_user_manuals():
     builddir = conf[CONF_BUILDDIR]

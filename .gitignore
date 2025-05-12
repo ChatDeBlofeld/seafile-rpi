@@ -2,7 +2,8 @@
 build/
 seafile-sources/
 seafile-server-pkgs/
-packages
+packages/
+logs/
 
 # build artefacts
 .build.sh.swp
