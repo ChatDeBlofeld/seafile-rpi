@@ -5,7 +5,7 @@ greenlet
 lxml
 MarkupSafe
 mysqlclient
-Pillow
+pillow
 pkg_resources
 pylibmc
 python-ldap
