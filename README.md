@@ -1,4 +1,4 @@
-Seafile server package for Raspberry Pi. Maintained by seafile community.
+Seafile server package for Raspberry Pi. Fork of [haiwen/seafile-rpi](github.com/haiwen/seafile-rpi), tailored for serving as base package of my docker images.
 
 ## Native build
 
@@ -164,14 +164,6 @@ $ ./build_with_docker.sh -B local/seafile-builder:buster-arm64 -T1236789
 
 - [Build Seafile server](https://manual.seafile.com/build_seafile/rpi/)
 - [Deploy Seafile server](https://manual.seafile.com/deploy/)
-
-## Reporting Issues / GitHub Issues
-
-If you have any problems or suggestions when using the seafile rpi server package, please report it
-on [seafile server forum](https://forum.seafile.com/).
-
-**GitHub Issues support is dropped** and will not be maintained anymore. If you need help, clarification or report some
-weird behaviour, please post it on the [seafile server forum](https://forum.seafile.com/) as well.
 
 ## Contributors
 
