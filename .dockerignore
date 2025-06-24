@@ -1,8 +1,4 @@
 *
 
-# Folders
-!/requirements
-
-# Files
+# Ignore everything except the build script
 !/build.sh
-!/build-server.tmp.py
