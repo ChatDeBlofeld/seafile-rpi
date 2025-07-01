@@ -258,6 +258,7 @@ install_dependencies()
      golang-go \
      intltool \
      libarchive-dev \
+     libargon2-dev \
      libcurl4-openssl-dev \
      libevent-dev \
      libffi-dev \
