@@ -404,7 +404,7 @@ build_seafile()
   # FIXME: make a pull request upstream to remove this file
   echo "" > ./doc/Makefile.am
   (set -x; ./autogen.sh)
-  (set -x; ./configure --with-mysql=${MYSQL_CONFIG_PATH} --enable-ldap)
+  (set -x; ./configure --with-mysql=${MYSQL_CONFIG_PATH})
   (set -x; make dist)
   exitonfailure "Build seafile-server failed"
   cd "${SCRIPTPATH}"

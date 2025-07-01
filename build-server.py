@@ -196,7 +196,7 @@ class Seafile(Project):
         if conf[CONF_ENABLE_S3]:
             s3_support = '--enable-s3'
 
-        configure_command = './configure --prefix=%s %s --enable-ldap' % (self.prefix, s3_support)
+        configure_command = './configure --prefix=%s %s' % (self.prefix, s3_support)
         if conf[CONF_MYSQL_CONFIG]:
             configure_command += ' --with-mysql=%s' % conf[CONF_MYSQL_CONFIG]
 
