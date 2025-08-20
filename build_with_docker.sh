@@ -73,6 +73,11 @@ fi
 ROOT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd "$ROOT_DIR"
 
+# Register/update emulators
+docker pull tonistiigi/binfmt:latest >/dev/null
+docker run --rm --privileged tonistiigi/binfmt --uninstall qemu-* >/dev/null
+docker run --rm --privileged tonistiigi/binfmt --install all >/dev/null
+
 mkdir -p "$LOGS_DIR"
 
 IFS=',' read -r -a platforms <<< "$PLATFORMS"
@@ -97,6 +102,7 @@ do
 
     (set -x;
     docker run -it --rm \
+        --platform "$platform" \
         -v "$ROOT_DIR/build.sh":/build.sh \
         -v "$ROOT_DIR/build-server.py":/build-server.py \
         -v "$ROOT_DIR/requirements":/requirements \
