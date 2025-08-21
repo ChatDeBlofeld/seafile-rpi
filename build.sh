@@ -264,6 +264,7 @@ install_dependencies()
      libffi-dev \
      libfuse-dev \
      libglib2.0-dev \
+     libheif-dev \
      libjansson-dev \
      libjpeg-dev \
      libjwt-dev \
