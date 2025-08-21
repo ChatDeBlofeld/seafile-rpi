@@ -8,11 +8,12 @@ Usage: $0 [options]
 
 Options:
   -B <builder>  Builder image prefix (required)            [BUILDER]
-  -c <dir>      Cache directory (default: ./build)         [CACHE_DIR]
+  -C <dir>      Cache directory (default: ./build)         [CACHE_DIR]
   -o <dir>      Output directory (default: ./packages)     [OUTPUT_DIR]
   -l <dir>      Logs directory (default: ./logs)           [LOGS_DIR]
   -P <plats>    Platforms (comma-separated, required)      [PLATFORMS]
   -v <ver>      Seafile server version, passed to build.sh [SEAFILE_SERVER_VERSION]
+  -c            Clean cache directory before building
   -r <arg>      Pass -r to build.sh
   -f <file>     Pass -f to build.sh
   -0..-9, -A, -T  Pass these flags to build.sh
@@ -33,11 +34,12 @@ if [ "$SEAFILE_SERVER_VERSION" ]; then
     ARGS="-v $SEAFILE_SERVER_VERSION"
 fi
 
-while getopts B:c:o:l:P:0123456789ATv:r:f:h flag
+while getopts B:cC:o:l:P:0123456789ATv:r:f:h flag
 do
     case "${flag}" in
         B) BUILDER=$OPTARG;;
-        c) CACHE_DIR=$OPTARG;;
+        C) CACHE_DIR=$OPTARG;;
+        c) CLEAN=1;;
         o) OUTPUT_DIR=$OPTARG;;
         l) LOGS_DIR=$OPTARG;;
         P) PLATFORMS=$OPTARG;;
@@ -86,6 +88,11 @@ do
     arch="$(sed 's#linux/##' <<< $platform)"
     tag="$(sed 's#/##' <<< $arch)"
 
+    clean_cmd="true"
+    if [ $CLEAN ]; then
+        clean_cmd="rm -rf /haiwen-build/* /built-seafile-sources/* /root/opt/local/*" 
+    fi
+
     if [ ! -d "$CACHE_DIR/$tag" ]; then
         mkdir -p "$OUTPUT_DIR/$tag"
     fi
@@ -94,7 +101,8 @@ do
         mkdir -p "$OUTPUT_DIR/$tag"
     fi
 
-    cmd="/build.sh $ARGS \
+    cmd="$clean_cmd \
+        && /build.sh $ARGS \
         && chown -R $(id -u):$(id -g) /built-seafile-server-pkgs"
 
     timestamp=$(date +"%Y%m%d_%H%M%S")
