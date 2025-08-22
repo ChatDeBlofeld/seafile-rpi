@@ -4,12 +4,12 @@ Seafile server package for Raspberry Pi. Fork of [haiwen/seafile-rpi](github.com
 
 See below for (cross-)compilation with docker.
 
-E.g. to compile Seafile server v11.0.13:
+E.g. to compile Seafile server v12.0.14:
 
 ```shell
 $ git clone --depth=1 https://github.com/haiwen/seafile-rpi.git && cd seafile-rpi
 $ chmod u+x build.sh
-$ sudo ./build.sh -DTA -v 11.0.13
+$ sudo ./build.sh -DTA -v 12.0.14
 ```
 
 Calling `./build.sh` without arguments will return usage information and a list of all available arguments:
@@ -38,7 +38,7 @@ Usage:
     -A          All options -0 to -9 in one go
 
     -v <vers>   Set seafile server version to build
-                default: 11.0.13
+                default: 12.0.14
     -r <vers>   Set libsearpc version
                 default: 3.3-latest
     -f <vers>   Set fixed libsearpc version
@@ -47,29 +47,23 @@ Usage:
     use --version for version info of this script.
 ```
 
-Schema of created directory structure after execution of `./build.sh`:
+Schema (trimmed) of created directory structure after execution of `./build.sh`:
 
 ```
-seafile@rpi-focal:~$ tree . -L 3
 .
-├── build.sh
-├── build-server.py.patch
-├── built-seafile-server-pkgs
-│   └── seafile-server-11.0.13-focal-armv7l.tar.gz
-├── built-seafile-sources
-│   └── R11.0.13
-├── go
-│   └── pkg
-├── haiwen-build
-│   ├── libevhtp
-│   ├── libsearpc
-│   ├── seafdav
-│   ├── seafile-server
-│   ├── seafobj
-│   ├── seahub
-│   └── seahub_thirdparty
-└── opt
-    └── local
+├── build
+│   ├── amd64
+│   │   ├── built-seafile-sources
+│   │   ├── haiwen-build
+│   │   └── root
+│   └── ...
+├── logs
+└── packages
+    ├── amd64
+    │   └── seafile-server-12.0.14-noble-x86-64.tar.gz
+    ├── arm64
+    ├── armv7
+    └── riscv64
 ```
 
 ## Docker build
