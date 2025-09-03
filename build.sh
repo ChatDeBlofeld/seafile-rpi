@@ -431,6 +431,11 @@ build_seafile_go_fileserver()
     (set -x; git clone --branch "${VERSION_TAG}" --depth 1 "https://github.com/haiwen/seafile-server.git")
     cd seafile-server
   fi
+
+  # Annoying fix for riscv64 architecture
+  sed -i '1 s/^.*$/\/\/go:build !riscv64 \&\& !arm64/' fileserver/utils/dup2.go
+  sed -i '1 s/^.*$/\/\/go:build riscv64 \|\| arm64/' fileserver/utils/dup3.go
+  
   (set -x; cd fileserver && CGO_ENABLED=0 go build .)
   exitonfailure "Build seafile-server (go_fileserver) failed"
   cd "${SCRIPTPATH}"
@@ -458,6 +463,11 @@ build_seafile_notification_server()
   fi
   # FIXME: make a pull request upstream to remove this file
   echo "" > ./doc/Makefile.am
+
+  # Annoying fix for riscv64 architecture
+  sed -i '1 s/^.*$/\/\/go:build !riscv64 \&\& !arm64/' notification-server/dup2.go
+  sed -i '1 s/^.*$/\/\/go:build riscv64 \|\| arm64/' notification-server/dup3.go
+
   (set -x; cd notification-server && CGO_ENABLED=0 go build .)
   exitonfailure "Build seafile-server (notification_server) failed"
   cd "${SCRIPTPATH}"
